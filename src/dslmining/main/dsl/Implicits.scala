@@ -1,6 +1,6 @@
 package dsl
 
-import api.{SimilarityType, UserBasedRecommenderImpl, RecommendationType}
+import api.UserBasedRecommenderImpl
 import dsl.Implicits.WithPath
 
 /**
@@ -13,6 +13,15 @@ object Implicits {
   type WithRecommendationType = (WithPath,RecommendationType)
   type withSimilarity = (WithPath,RecommendationType,SimilarityType)
   type withNeighbourhood = (WithPath,RecommendationType,SimilarityType,NeighbourHoodSize)
+
+  type UserId = Long
+  type NumberOfItens = Int
+  type WithNumberOfItems = (UserId,NumberOfItens)
+
+
+  implicit def WithNumberOfItems(userId: UserId): UserIdHelper =
+    new UserIdHelper(userId)
+
 
   implicit def WithPath2RecommenderHelper(path: WithPath): RecommenderHelper =
       new RecommenderHelper(path)
@@ -31,6 +40,12 @@ object Implicits {
     }
   }
 
+  class UserIdHelper(userId:UserId){
+    def numberOfItens(numberOfItens:NumberOfItens): WithNumberOfItems ={
+      new WithNumberOfItems (userId,numberOfItens)
+    }
+  }
+
   class RecommenderHelper(path: WithPath){
     def a(recommenderType:RecommendationType): WithRecommendationType ={
       new WithRecommendationType (path,recommenderType)
@@ -38,13 +53,13 @@ object Implicits {
   }
 
   class SimilarityHelper(tuple: WithRecommendationType){
-    def similarity(similarity:SimilarityType): withSimilarity = {
+    def using(similarity:SimilarityType): withSimilarity = {
       new withSimilarity(tuple._1,tuple._2,similarity)
     }
   }
 
   class NeighbourhoodHelper(tuple: withSimilarity){
-    def neighbourhood(neighbourHoodSize:NeighbourHoodSize): withNeighbourhood = {
+    def neighbourhoodSize(neighbourHoodSize:NeighbourHoodSize): withNeighbourhood = {
       new withNeighbourhood(tuple._1,tuple._2,tuple._3,neighbourHoodSize)
     }
   }

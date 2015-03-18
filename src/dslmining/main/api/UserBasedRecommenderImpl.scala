@@ -1,8 +1,9 @@
 package api
 
 import java.io.File
-
-import dsl.Implicits.{NeighbourHoodSize, WithPath}
+import scala.collection.JavaConversions._
+import dsl.Implicits.{WithNumberOfItems, UserId, NeighbourHoodSize, WithPath}
+import dsl.{RecommendationType, EUCLIDEAN_DISTANCE, PEARSON_CORRELATION, SimilarityType}
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel
 import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood
 import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender
@@ -11,7 +12,7 @@ import org.apache.mahout.cf.taste.impl.similarity.EuclideanDistanceSimilarity
 
 import org.apache.mahout.cf.taste.model.DataModel
 import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood
-import org.apache.mahout.cf.taste.recommender.Recommender
+import org.apache.mahout.cf.taste.recommender.{RecommendedItem, Recommender}
 import org.apache.mahout.cf.taste.similarity.UserSimilarity
 
 /**
@@ -28,13 +29,15 @@ case class UserBasedRecommenderImpl (val path: WithPath, val recomType: Recommen
     var recommender:Recommender = new GenericUserBasedRecommender (dataModel, neighborhood, similarity);
 
 
-
+    def recommendTo(userId: UserId): List[RecommendedItem] ={
+      asScalaBuffer(recommender.recommend(userId,10)).toList
+  }
 
 
   implicit def  similarityTypeToSimilarityObject(tuple: (SimilarityType,DataModel)): UserSimilarity ={
-    tuple._1 match {
-      case PEARSON_SIMILARITY => new PearsonCorrelationSimilarity(tuple._2)
-      case EUCLIDEAN => new EuclideanDistanceSimilarity(tuple._2)
+    tuple match {
+      case (PEARSON_CORRELATION,dataModel:DataModel) => new PearsonCorrelationSimilarity(dataModel)
+      case (EUCLIDEAN_DISTANCE,dataModel:DataModel) => new EuclideanDistanceSimilarity(dataModel)
     }
   }
 }

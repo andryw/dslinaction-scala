@@ -1,4 +1,4 @@
-package api
+package dsl
 
 /**
  * Created by andryw on 17/03/15.
