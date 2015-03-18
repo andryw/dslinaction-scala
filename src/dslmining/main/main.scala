@@ -9,7 +9,7 @@ object main {
   def main(args:Array[String]): Unit ={
     val recommender:UserBasedRecommenderImpl = train on_dataset "data/intro1.csv" a USER_BASED_RECOMMENDER using PEARSON_CORRELATION neighbourhoodSize 10
 
-    println(recommender recommendTo 2l)
+    println(recommender to 2l recommends 10)
 
   }
 

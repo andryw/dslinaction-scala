@@ -29,8 +29,8 @@ case class UserBasedRecommenderImpl (val path: WithPath, val recomType: Recommen
     var recommender:Recommender = new GenericUserBasedRecommender (dataModel, neighborhood, similarity);
 
 
-    def recommendTo(userId: UserId): List[RecommendedItem] ={
-      asScalaBuffer(recommender.recommend(userId,10)).toList
+    def to(userId: UserId):UserBasedHelper  ={
+    new UserBasedHelper(recommender,userId)
   }
 
 
@@ -39,5 +39,12 @@ case class UserBasedRecommenderImpl (val path: WithPath, val recomType: Recommen
       case (PEARSON_CORRELATION,dataModel:DataModel) => new PearsonCorrelationSimilarity(dataModel)
       case (EUCLIDEAN_DISTANCE,dataModel:DataModel) => new EuclideanDistanceSimilarity(dataModel)
     }
+  }
+}
+
+case class UserBasedHelper(recommender:Recommender,userId:UserId){
+  def recommends (numberOfItems: Int): List[RecommendedItem] ={
+    asScalaBuffer(recommender.recommend(userId,numberOfItems)).toList
+
   }
 }
